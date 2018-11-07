@@ -7,19 +7,36 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.androidapp.bitoasis.bitoasis.R;
+import com.androidapp.bitoasis.bitoasis.listeners.BitWebSocketListener;
+import com.androidapp.bitoasis.bitoasis.model.TickerDetailsModel;
+import com.androidapp.bitoasis.bitoasis.utils.NetworkUtils;
+import com.androidapp.bitoasis.bitoasis.utils.StringParsingUtil;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.WebSocket;
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link SecondViewkFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
  * Use the {@link SecondViewkFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
 public class SecondViewkFragment extends Fragment {
-
+    private OkHttpClient client;
+    Button _startButton;
+    EditText _numberText;
+    ImageView _stockImageView;
+    TextView _lastTrade, _pcl, _htp, _ltp;
+    WebSocket wSocket;
 
 
 
@@ -44,7 +61,43 @@ public class SecondViewkFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        client = new OkHttpClient();
 
+    }
+    @Override
+    public void onViewCreated(View view,
+                              Bundle savedInstanceState) {
+        _lastTrade = view.findViewById(R.id.lastTrade);
+        _pcl = view.findViewById(R.id.pcl);
+        _htp = view.findViewById(R.id.htp);
+        _ltp = view.findViewById(R.id.ltp);
+
+        _startButton = view.findViewById(R.id.btn_start);
+        _numberText = view.findViewById(R.id.input_number);
+        _stockImageView = view.findViewById(R.id.stock_imageview);
+        _startButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // TODO:Check internet connection and user input
+                // TODO:Check if its already started
+                if (_numberText.getText().toString().trim().length() > 0) {
+                    if (NetworkUtils.isInternetConnected(getActivity())) {
+
+                        start();
+
+
+                    } else {
+                        Toast.makeText(getActivity(), "Please Connect to the Internet", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(getActivity(), "Please Fill the Above with a Number", Toast.LENGTH_SHORT).show();
+
+                }
+            }
+
+
+        });
+        super.onViewCreated(view, savedInstanceState);
     }
 
     @Override
@@ -70,18 +123,42 @@ public class SecondViewkFragment extends Fragment {
         super.onDetach();
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+    private void start() {
+        Request request = new Request.Builder().url("wss://api2.poloniex.com").build();
+        BitWebSocketListener listener = new BitWebSocketListener();
+        listener.setSecondViewkFragmen(SecondViewkFragment.this);
+            wSocket = client.newWebSocket(request, listener);
+            client.dispatcher().executorService().shutdown();
+
+
     }
+
+    public void output(final String txt) {
+        final StringParsingUtil stringParsingUtil = new StringParsingUtil();
+
+        final TickerDetailsModel tickerDetailsModel = stringParsingUtil.getModelFromText(txt);
+
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                SetData(tickerDetailsModel);
+            }
+        });
+    }
+
+    private void SetData(TickerDetailsModel tickerDetailsModel) {
+        if (_numberText.getText().toString().trim().length() > 0 && tickerDetailsModel.getLastTradePrice() != null) {
+            if (Integer.parseInt(_numberText.getText().toString()) > Double.parseDouble(tickerDetailsModel.getLastTradePrice())) {
+                _stockImageView.setImageResource(R.drawable.ic_arrow_down);
+            } else {
+
+                _stockImageView.setImageResource(R.drawable.ic_arrow_up);
+            }
+            _lastTrade.setText(tickerDetailsModel.getLastTradePrice());
+            _pcl.setText(tickerDetailsModel.getPercentChangeInLast());
+            _htp.setText(tickerDetailsModel.getHighestTradePrice());
+            _ltp.setText(tickerDetailsModel.getLowestTradePrice());
+        }
+    }
+
 }

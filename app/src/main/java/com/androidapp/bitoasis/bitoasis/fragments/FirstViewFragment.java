@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.androidapp.bitoasis.bitoasis.R;
 import com.androidapp.bitoasis.bitoasis.listeners.BitWebSocketListener;
@@ -78,10 +79,10 @@ public class FirstViewFragment extends Fragment {
 
 
                     } else {
-                        // showSnackMessage("Please Connect to the Internet");
+                        Toast.makeText(getActivity(), "Please Connect to the Internet", Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    //  showSnackMessage("Please Fill the Above with a Number");
+                    Toast.makeText(getActivity(), "Please Fill the Above with a Number", Toast.LENGTH_SHORT).show();
 
                 }
             }
@@ -107,6 +108,7 @@ public class FirstViewFragment extends Fragment {
 
     @Override
     public void onDetach() {
+
         super.onDetach();
     }
 
@@ -114,10 +116,9 @@ public class FirstViewFragment extends Fragment {
         Request request = new Request.Builder().url("wss://api2.poloniex.com").build();
         BitWebSocketListener listener = new BitWebSocketListener();
         listener.setFirstViewFragment(FirstViewFragment.this);
-        if (wSocket == null) {
             wSocket = client.newWebSocket(request, listener);
             client.dispatcher().executorService().shutdown();
-        }
+
 
     }
 

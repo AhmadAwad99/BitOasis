@@ -7,7 +7,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.view.MenuItem;
 
-
 import com.androidapp.bitoasis.bitoasis.R;
 import com.androidapp.bitoasis.bitoasis.fragments.FirstViewFragment;
 import com.androidapp.bitoasis.bitoasis.fragments.SecondViewkFragment;
@@ -17,8 +16,6 @@ public class MainActivity extends BaseActivity {
 
     FirstViewFragment firstViewFragment;
     SecondViewkFragment secondViewkFragment;
-
-
 
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -49,9 +46,7 @@ public class MainActivity extends BaseActivity {
         secondViewkFragment = SecondViewkFragment.newInstance();
 
 
-            setUpFragment(firstViewFragment);
-
-
+        setUpFragment(firstViewFragment);
 
 
     }

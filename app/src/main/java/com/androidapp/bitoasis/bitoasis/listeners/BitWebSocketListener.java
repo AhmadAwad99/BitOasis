@@ -1,6 +1,7 @@
 package com.androidapp.bitoasis.bitoasis.listeners;
 
 import com.androidapp.bitoasis.bitoasis.fragments.FirstViewFragment;
+import com.androidapp.bitoasis.bitoasis.fragments.SecondViewkFragment;
 
 import okhttp3.Response;
 import okhttp3.WebSocket;
@@ -13,9 +14,14 @@ import okio.ByteString;
 public class BitWebSocketListener extends WebSocketListener {
     private static final int NORMAL_CLOSURE_STATUS = 1000;
     private FirstViewFragment firstViewFragment;
+    private SecondViewkFragment secondViewkFragmen;
 
-    public void setFirstViewFragment(FirstViewFragment mainActivity) {
-        this.firstViewFragment = mainActivity;
+    public void setFirstViewFragment(FirstViewFragment firstViewFragment1) {
+        this.firstViewFragment = firstViewFragment1;
+    }
+
+    public void setSecondViewkFragmen(SecondViewkFragment secondViewkFragment) {
+        this.secondViewkFragmen = secondViewkFragment;
     }
 
     @Override
@@ -32,14 +38,16 @@ public class BitWebSocketListener extends WebSocketListener {
 
     @Override
     public void onMessage(WebSocket webSocket, String text) {
-        firstViewFragment.output("Receiving : " + text);
+        if (firstViewFragment != null)
+            firstViewFragment.output("Receiving : " + text);
+        else
+            secondViewkFragmen.output("Receiving : " + text);
 
 
     }
 
     @Override
     public void onMessage(WebSocket webSocket, ByteString bytes) {
-        firstViewFragment.output("Receiving : " + bytes);
 
     }
 
@@ -50,6 +58,5 @@ public class BitWebSocketListener extends WebSocketListener {
 
     @Override
     public void onFailure(WebSocket webSocket, Throwable t, Response response) {
-        firstViewFragment.output("Error : " + t.getMessage());
     }
 }
