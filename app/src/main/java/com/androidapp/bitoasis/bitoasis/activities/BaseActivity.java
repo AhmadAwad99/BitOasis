@@ -17,57 +17,10 @@ public class BaseActivity extends AppCompatActivity {
 
     }
 
-    /**
-     * Setup tool bar in base activity
-     *
-     * @param toolBar  toolbar
-     * @param title    title of toolbar
-     * @param subtitle subtitle of the toolbar
-     */
-    protected void setUpToolBar(Toolbar toolBar, String title, String subtitle) {
-
-        toolBar.setTitle(title);
-
-        toolBar.setSubtitle(subtitle);
-
-        toolBar.setNavigationIcon(null);
-
-    }
 
 
 
-    /**
-     * Setup tool bar in base activity
-     *
-     * @param toolBar toolbar
-     * @param title   title of toolbar
-     */
-    protected void setUpToolBar(Toolbar toolBar, String title) {
 
-        setUpToolBar(toolBar, title, null);
-    }
-
-
-    /**
-     * visibility of tool bar in base activity
-     *
-     * @param toolbar toolbar
-     * @param hide    visibility of toolbar
-     */
-    protected void hideToolbar(Toolbar toolbar, boolean hide) {
-        toolbar.setVisibility(hide ? View.GONE : View.VISIBLE);
-    }
-
-    /**
-     * General function to show  snack bar
-     *
-     * @param message message to be showing in the snack bar
-     */
-    public void showSnackMessage(String message) {
-
-        showSnackMessage(android.R.id.content, message);
-
-    }
 
     /**
      * General function to show  snack bar

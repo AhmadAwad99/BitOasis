@@ -1,6 +1,6 @@
 package com.androidapp.bitoasis.bitoasis.listeners;
 
-import com.androidapp.bitoasis.bitoasis.activities.MainActivity;
+import com.androidapp.bitoasis.bitoasis.fragments.FirstViewFragment;
 
 import okhttp3.Response;
 import okhttp3.WebSocket;
@@ -12,10 +12,10 @@ import okio.ByteString;
  */
 public class BitWebSocketListener extends WebSocketListener {
     private static final int NORMAL_CLOSURE_STATUS = 1000;
-    private MainActivity mainActivity;
+    private FirstViewFragment firstViewFragment;
 
-    public void setMainActivity(MainActivity mainActivity) {
-        this.mainActivity = mainActivity;
+    public void setFirstViewFragment(FirstViewFragment mainActivity) {
+        this.firstViewFragment = mainActivity;
     }
 
     @Override
@@ -32,14 +32,14 @@ public class BitWebSocketListener extends WebSocketListener {
 
     @Override
     public void onMessage(WebSocket webSocket, String text) {
-        mainActivity.output("Receiving : " + text);
+        firstViewFragment.output("Receiving : " + text);
 
 
     }
 
     @Override
     public void onMessage(WebSocket webSocket, ByteString bytes) {
-        mainActivity.output("Receiving : " + bytes);
+        firstViewFragment.output("Receiving : " + bytes);
 
     }
 
@@ -50,6 +50,6 @@ public class BitWebSocketListener extends WebSocketListener {
 
     @Override
     public void onFailure(WebSocket webSocket, Throwable t, Response response) {
-        mainActivity.output("Error : " + t.getMessage());
+        firstViewFragment.output("Error : " + t.getMessage());
     }
 }

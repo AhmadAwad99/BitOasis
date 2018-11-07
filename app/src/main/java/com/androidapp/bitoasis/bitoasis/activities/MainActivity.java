@@ -1,108 +1,73 @@
 package com.androidapp.bitoasis.bitoasis.activities;
 
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.view.MenuItem;
+
 
 import com.androidapp.bitoasis.bitoasis.R;
-import com.androidapp.bitoasis.bitoasis.listeners.BitWebSocketListener;
-import com.androidapp.bitoasis.bitoasis.model.TickerDetailsModel;
-import com.androidapp.bitoasis.bitoasis.utils.NetworkUtils;
-import com.androidapp.bitoasis.bitoasis.utils.StringParsingUtil;
+import com.androidapp.bitoasis.bitoasis.fragments.FirstViewFragment;
+import com.androidapp.bitoasis.bitoasis.fragments.SecondViewkFragment;
 
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.WebSocket;
 
 public class MainActivity extends BaseActivity {
-    private OkHttpClient client;
-    Button _startButton;
-    EditText _numberText;
-    ImageView _stockImageView;
-    TextView _lastTrade, _pcl, _htp, _ltp;
-    WebSocket wSocket;
+
+    FirstViewFragment firstViewFragment;
+    SecondViewkFragment secondViewkFragment;
+
+
+
+
+    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
+            = new BottomNavigationView.OnNavigationItemSelectedListener() {
+
+        @Override
+        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.navigation_first_view:
+                    setUpFragment(firstViewFragment);
+                    return true;
+                case R.id.navigation_second_view:
+                    setUpFragment(secondViewkFragment);
+                    return true;
+
+            }
+            return false;
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        client = new OkHttpClient();
-
-
-        _lastTrade = findViewById(R.id.lastTrade);
-        _pcl = findViewById(R.id.pcl);
-        _htp = findViewById(R.id.htp);
-        _ltp = findViewById(R.id.ltp);
+        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        firstViewFragment = FirstViewFragment.newInstance();
+        secondViewkFragment = SecondViewkFragment.newInstance();
 
 
-        _startButton = findViewById(R.id.btn_start);
-        _numberText = findViewById(R.id.input_number);
-        _stockImageView = findViewById(R.id.stock_imageview);
-        _startButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // TODO:Check internet connection and user input
-                // TODO:Check if its already started
-                if (_numberText.getText().toString().trim().length() > 0) {
-                    if (NetworkUtils.isInternetConnected(MainActivity.this)) {
-
-                        start();
+            setUpFragment(firstViewFragment);
 
 
-                    } else {
-                        showSnackMessage("Please Connect to the Internet");
-                    }
-                } else {
-                    showSnackMessage("Please Fill the Above with a Number");
 
-                }
-            }
-
-
-        });
-    }
-
-    private void start() {
-        Request request = new Request.Builder().url("wss://api2.poloniex.com").build();
-        BitWebSocketListener listener = new BitWebSocketListener();
-        listener.setMainActivity(MainActivity.this);
-        if (wSocket == null) {
-            wSocket = client.newWebSocket(request, listener);
-            client.dispatcher().executorService().shutdown();
-        }
 
     }
 
-    public void output(final String txt) {
-        final StringParsingUtil stringParsingUtil = new StringParsingUtil();
 
-        final TickerDetailsModel tickerDetailsModel = stringParsingUtil.getModelFromText(txt);
+    private void setUpFragment(Fragment fragment) {
 
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                SetData(tickerDetailsModel);
-            }
-        });
-    }
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.setCustomAnimations(android.R.anim.slide_in_left,
+                android.R.anim.slide_out_right,
+                R.anim.ltr_anim,
+                R.anim.rtl_anim);
+        transaction.replace(R.id.container, fragment);
 
-    private void SetData(TickerDetailsModel tickerDetailsModel) {
-        if (_numberText.getText().toString().trim().length() > 0 && tickerDetailsModel.getLastTradePrice() != null) {
-            if (Integer.parseInt(_numberText.getText().toString()) > Double.parseDouble(tickerDetailsModel.getLastTradePrice())) {
-                _stockImageView.setImageResource(R.drawable.ic_arrow_down);
-            } else {
+        transaction.commit();
 
-                _stockImageView.setImageResource(R.drawable.ic_arrow_up);
-            }
-            _lastTrade.setText(tickerDetailsModel.getLastTradePrice());
-            _pcl.setText(tickerDetailsModel.getPercentChangeInLast());
-            _htp.setText(tickerDetailsModel.getHighestTradePrice());
-            _ltp.setText(tickerDetailsModel.getLowestTradePrice());
-        }
     }
 
 
